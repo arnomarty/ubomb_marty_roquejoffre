@@ -11,11 +11,11 @@ public enum WorldEntity {
     Empty('_'),         //OK
     Box('B'),           //OK
     Heart('H'),         //OK
-    Key('K'),
+    Key('K'),           //OK
     Monster('M'),
-    DoorPrevOpened('V'),
-    DoorNextOpened('N'),
-    DoorNextClosed('n'),
+    DoorPrevOpened('V'),//OK
+    DoorNextOpened('N'),//OK
+    DoorNextClosed('n'),//OK
     Player('P'),        //OK
     Stone('S'),         //OK
     Tree('T'),          //OK
