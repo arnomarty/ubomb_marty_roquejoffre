@@ -8,17 +8,17 @@ import java.util.Arrays;
 import java.util.Optional;
 
 public enum WorldEntity {
-    Empty('_'),
-    Box('B'),
-    Heart('H'),
+    Empty('_'),         //OK
+    Box('B'),           //OK
+    Heart('H'),         //OK
     Key('K'),
     Monster('M'),
     DoorPrevOpened('V'),
     DoorNextOpened('N'),
     DoorNextClosed('n'),
-    Player('P'),
-    Stone('S'),
-    Tree('T'),
+    Player('P'),        //OK
+    Stone('S'),         //OK
+    Tree('T'),          //OK
     Princess('W'),
     BombRangeInc('>'),
     BombRangeDec('<'),
