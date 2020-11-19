@@ -41,6 +41,8 @@ public class WorldBuilder {
                 return new Heart();
             case Key:
                 return new Key();
+            case Princess:
+                return new Princess();
             case DoorPrevOpened:
                 return new DoorPrevOpened();
             case DoorNextOpened:
