@@ -8,6 +8,7 @@ import static fr.ubx.poo.view.image.ImageResource.*;
 
 import fr.ubx.poo.game.Position;
 import fr.ubx.poo.model.decor.*;
+import fr.ubx.poo.model.decor.consumables.*;
 import fr.ubx.poo.model.decor.doors.DoorNextClosed;
 import fr.ubx.poo.model.decor.doors.DoorNextOpened;
 import fr.ubx.poo.model.decor.doors.DoorPrevOpened;
@@ -36,6 +37,14 @@ public final class SpriteFactory {
             return new SpriteDecor(layer, factory.get(DOORNEXTOPENED), position);
         if (decor instanceof DoorNextClosed)
             return new SpriteDecor(layer, factory.get(DOORNEXTCLOSED), position);
+        if (decor instanceof BombRangeInc)
+            return new SpriteDecor(layer, factory.get(BOMBRANGEINC), position);
+        if (decor instanceof BombRangeDec)
+            return new SpriteDecor(layer, factory.get(BOMBRANGEDEC), position);
+        if (decor instanceof BombNumberInc)
+            return new SpriteDecor(layer, factory.get(BOMBNUMBERINC), position);
+        if (decor instanceof BombNumberDec)
+            return new SpriteDecor(layer, factory.get(BOMBNUMBERDEC), position);
         return null;
     }
 

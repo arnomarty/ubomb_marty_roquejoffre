@@ -1,4 +1,6 @@
-package fr.ubx.poo.model.decor;
+package fr.ubx.poo.model.decor.consumables;
+
+import fr.ubx.poo.model.decor.Decor;
 
 public class Heart extends Decor {
     @Override

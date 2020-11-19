@@ -27,6 +27,10 @@ public enum ImageResource {
     DOORPREVOPENED("door_opened.png"),
     DOORNEXTOPENED("door_opened.png"),
     DOORNEXTCLOSED("door_closed.png"),
+    BOMBRANGEINC("bonus_bomb_range_inc.png"),
+    BOMBRANGEDEC("bonus_bomb_range_dec.png"),
+    BOMBNUMBERINC("bonus_bomb_nb_inc.png"),
+    BOMBNUMBERDEC("bonus_bomb_nb_dec.png"),
     ;
 
     private final String FileName;

@@ -1,6 +1,7 @@
 package fr.ubx.poo.game;
 
 import fr.ubx.poo.model.decor.*;
+import fr.ubx.poo.model.decor.consumables.*;
 import fr.ubx.poo.model.decor.doors.*;
 import fr.ubx.poo.model.decor.Decor;
 import fr.ubx.poo.model.decor.Stone;
@@ -46,6 +47,14 @@ public class WorldBuilder {
                 return new DoorNextOpened();
             case DoorNextClosed:
                 return new DoorNextClosed();
+            case BombRangeInc:
+                return new BombRangeInc();
+            case BombRangeDec:
+                return new BombRangeDec();
+            case BombNumberInc:
+                return new BombNumberInc();
+            case BombNumberDec:
+                return new BombNumberDec();
             default:
                 return null;
         }
