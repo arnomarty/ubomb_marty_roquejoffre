@@ -140,6 +140,10 @@ public final class GameEngine {
             gameLoop.stop();
             showMessage("Gagné", Color.BLUE);
         }
+        if(game.getWorld().getChanges()){
+            render();
+            game.getWorld().setChanges(false);
+        }
     }
 
     private void render() {

@@ -10,6 +10,7 @@ import fr.ubx.poo.model.Movable;
 import fr.ubx.poo.model.decor.*;
 import fr.ubx.poo.model.go.GameObject;
 import fr.ubx.poo.game.Game;
+import fr.ubx.poo.view.sprite.SpriteFactory;
 
 public class Player extends GameObject implements Movable {
 
@@ -53,9 +54,11 @@ public class Player extends GameObject implements Movable {
         else{
             Position nextNextPos = direction.nextPosition(nextPos);
             Decor nextNextDecor = game.getWorld().get(nextNextPos);
-            if(nextNextDecor == null){
+            if(nextNextDecor == null && game.getWorld().isInside(nextNextPos)){
                 game.getWorld().clear(nextPos);
                 game.getWorld().set(nextNextPos, nextDecor);
+                game.getWorld().setChanges(true);
+                //game.getWorld().forEach( (pos,d) -> sprites.add(SpriteFactory.createDecor(layer, pos, d)));
                 return true;
             }
         }
