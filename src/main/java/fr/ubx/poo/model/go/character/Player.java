@@ -44,9 +44,22 @@ public class Player extends GameObject implements Movable {
     public boolean canMove(Direction direction) {
         Position nextPos = direction.nextPosition(getPosition());
         Decor nextDecor = game.getWorld().get(nextPos);
-        return (game.getWorld()).isInside(nextPos)
-                && !(nextDecor instanceof Stone)
-                && !(nextDecor instanceof Tree);
+
+        if( !(nextDecor instanceof Box) ){
+            return (game.getWorld()).isInside(nextPos)
+                 && !(nextDecor instanceof Stone)
+                 && !(nextDecor instanceof Tree);
+        }
+        else{
+            Position nextNextPos = direction.nextPosition(nextPos);
+            Decor nextNextDecor = game.getWorld().get(nextNextPos);
+            if(nextNextDecor == null){
+                game.getWorld().clear(nextPos);
+                game.getWorld().set(nextNextPos, nextDecor);
+                return true;
+            }
+        }
+        return false;
     }
 
     public void doMove(Direction direction) {
