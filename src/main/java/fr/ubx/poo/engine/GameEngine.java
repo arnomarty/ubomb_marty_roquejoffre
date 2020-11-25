@@ -12,6 +12,7 @@ import fr.ubx.poo.model.go.character.Player;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.scene.Group;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -141,6 +142,9 @@ public final class GameEngine {
             showMessage("Gagné", Color.BLUE);
         }
         if(game.getWorld().getChanges()){
+            sprites.forEach(Sprite::remove);
+            sprites.clear();
+            game.getWorld().forEach( (pos,d) -> sprites.add(SpriteFactory.createDecor(this.layer, pos, d)));
             render();
             game.getWorld().setChanges(false);
         }

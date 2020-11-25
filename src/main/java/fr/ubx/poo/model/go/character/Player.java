@@ -54,11 +54,11 @@ public class Player extends GameObject implements Movable {
         else{
             Position nextNextPos = direction.nextPosition(nextPos);
             Decor nextNextDecor = game.getWorld().get(nextNextPos);
+
             if(nextNextDecor == null && game.getWorld().isInside(nextNextPos)){
                 game.getWorld().clear(nextPos);
                 game.getWorld().set(nextNextPos, nextDecor);
                 game.getWorld().setChanges(true);
-                //game.getWorld().forEach( (pos,d) -> sprites.add(SpriteFactory.createDecor(layer, pos, d)));
                 return true;
             }
         }
