@@ -26,6 +26,8 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.List;
 
+import static fr.ubx.poo.game.Direction.random;
+
 
 public final class GameEngine {
 
@@ -140,6 +142,7 @@ public final class GameEngine {
 
     private void update(long now) {
         player.update(now);
+        monsters.forEach( m -> m.update(now));
 
         if (player.isAlive() == false) {
             gameLoop.stop();
@@ -150,7 +153,6 @@ public final class GameEngine {
             showMessage("Gagné", Color.BLUE);
         }
         if(game.getWorld().getChanges()){
-
             sprites.forEach(Sprite::remove);
             sprites.clear();
             game.getWorld().forEach( (pos,d) -> sprites.add(SpriteFactory.createDecor(this.layer, pos, d)));

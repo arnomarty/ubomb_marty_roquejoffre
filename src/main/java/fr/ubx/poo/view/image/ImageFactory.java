@@ -18,7 +18,7 @@ public final class ImageFactory {
     };
 
     private final ImageResource[] directionsMonster = new ImageResource[]{
-            MONSTER_UP, MONSTER_DOWN, MONSTER_LEFT, MONSTER_RIGHT,
+            MONSTER_UP, MONSTER_RIGHT, MONSTER_DOWN, MONSTER_LEFT,
     };
 
     private final ImageResource[] digits = new ImageResource[]{
