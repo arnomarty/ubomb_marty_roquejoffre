@@ -12,6 +12,7 @@ import fr.ubx.poo.model.decor.consumables.*;
 import fr.ubx.poo.model.decor.doors.DoorNextClosed;
 import fr.ubx.poo.model.decor.doors.DoorNextOpened;
 import fr.ubx.poo.model.decor.doors.DoorPrevOpened;
+import fr.ubx.poo.model.go.character.Monster;
 import fr.ubx.poo.model.go.character.Player;
 import fr.ubx.poo.view.image.ImageFactory;
 import javafx.scene.layout.Pane;
@@ -52,5 +53,9 @@ public final class SpriteFactory {
 
     public static Sprite createPlayer(Pane layer, Player player) {
         return new SpritePlayer(layer, player);
+    }
+//MONSTERSREQ
+    public static Sprite createMonster(Pane layer, Monster monster){
+        return new SpriteMonster(layer, monster);
     }
 }

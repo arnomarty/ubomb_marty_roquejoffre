@@ -5,6 +5,7 @@
 package fr.ubx.poo.engine;
 
 import fr.ubx.poo.game.Direction;
+import fr.ubx.poo.model.go.character.Monster;
 import fr.ubx.poo.view.sprite.Sprite;
 import fr.ubx.poo.view.sprite.SpriteFactory;
 import fr.ubx.poo.game.Game;
@@ -38,11 +39,16 @@ public final class GameEngine {
     private Input input;
     private Stage stage;
     private Sprite spritePlayer;
-
+//MONSTERSREQ
+    private List<Monster> monsters;
+    private List<Sprite> spriteMonsters = new ArrayList<>();
+//END
     public GameEngine(final String windowTitle, Game game, final Stage stage) {
         this.windowTitle = windowTitle;
         this.game = game;
         this.player = game.getPlayer();
+//MONSTERSREQ
+        this.monsters = game.getMonsters();
         initialize(stage, game);
         buildAndSetGameLoop();
     }
@@ -70,6 +76,8 @@ public final class GameEngine {
         // Create decor sprites
         game.getWorld().forEach( (pos,d) -> sprites.add(SpriteFactory.createDecor(layer, pos, d)));
         spritePlayer = SpriteFactory.createPlayer(layer, player);
+//MONSTERSREQ
+        monsters.forEach( m -> spriteMonsters.add(SpriteFactory.createMonster(layer, m)) );
 
     }
 
@@ -142,9 +150,12 @@ public final class GameEngine {
             showMessage("Gagné", Color.BLUE);
         }
         if(game.getWorld().getChanges()){
+
             sprites.forEach(Sprite::remove);
             sprites.clear();
             game.getWorld().forEach( (pos,d) -> sprites.add(SpriteFactory.createDecor(this.layer, pos, d)));
+
+            monsters.forEach( m -> spriteMonsters.add(SpriteFactory.createMonster(layer, m)) );
             render();
             game.getWorld().setChanges(false);
         }
@@ -152,8 +163,10 @@ public final class GameEngine {
 
     private void render() {
         sprites.forEach(Sprite::render);
+        spriteMonsters.forEach( sm -> sm.render() );
         // last rendering to have player in the foreground
         spritePlayer.render();
+
     }
 
     public void start() {
