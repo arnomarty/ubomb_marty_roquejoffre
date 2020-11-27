@@ -13,7 +13,7 @@ import java.util.TimerTask;
 
 public class Monster extends GameObject implements Movable {
 
-    private final boolean alive = true;
+    private boolean alive = true;
     Direction direction;
     private boolean moveRequested = false;
     private int lives = 1;
@@ -44,7 +44,8 @@ public class Monster extends GameObject implements Movable {
         Decor nextDecor = game.getWorld().get(nextPos);
 
         return (game.getWorld()).isInside(nextPos)
-                && !(nextDecor instanceof Decor);
+                && !(nextDecor instanceof Decor)
+                && !(game.monsterThere(nextPos));
 
     }
 

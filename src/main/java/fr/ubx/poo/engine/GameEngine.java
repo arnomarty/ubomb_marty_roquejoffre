@@ -197,6 +197,7 @@ public final class GameEngine {
             if(!b.explosionStatus()){
                 tmp.add(b);
             }else{
+
                 b.stop();
                 this.game.getWorld().setChanges(true);
             }
