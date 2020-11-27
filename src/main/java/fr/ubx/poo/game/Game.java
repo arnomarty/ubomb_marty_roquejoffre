@@ -71,5 +71,14 @@ public class Game {
 
     public List<Monster> getMonsters(){ return this.monsters; };
 
+    public boolean monsterThere(Position position){
+        for( Monster m : monsters){
+            if(m.getPosition().equals(position)){
+                return true;
+            }
+        }
+        return false;
+    }
+
 
 }

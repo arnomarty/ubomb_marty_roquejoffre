@@ -11,6 +11,7 @@ import fr.ubx.poo.model.decor.Stone;
 import fr.ubx.poo.model.decor.Tree;
 import fr.ubx.poo.model.go.GameObject;
 
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -31,7 +32,7 @@ public class Monster extends GameObject implements Movable {
         timer = new Timer();
         moveHandler = new MonsterTimer(this);
         //timer.scheduleAtFixedRate(() -> requestMove(Direction.random()), 1000, 1000);
-        timer.scheduleAtFixedRate(moveHandler, 1000, 400 );
+        timer.scheduleAtFixedRate(moveHandler, 1000, 1500 );
     }
 
     public void requestMove(Direction direction) {

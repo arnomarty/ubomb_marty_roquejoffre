@@ -55,7 +55,9 @@ public class Player extends GameObject implements Movable {
             Position nextNextPos = direction.nextPosition(nextPos);
             Decor nextNextDecor = game.getWorld().get(nextNextPos);
 
-            if(nextNextDecor == null && game.getWorld().isInside(nextNextPos)){
+            if(nextNextDecor == null && game.getWorld().isInside(nextNextPos)
+                && !game.monsterThere(nextNextPos)){
+
                 game.getWorld().clear(nextPos);
                 game.getWorld().set(nextNextPos, nextDecor);
                 game.getWorld().setChanges(true);
