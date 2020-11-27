@@ -3,6 +3,8 @@ package fr.ubx.poo.model;
 import fr.ubx.poo.game.Direction;
 import fr.ubx.poo.model.go.Bomb;
 import fr.ubx.poo.model.go.character.Monster;
+import fr.ubx.poo.model.go.character.Player;
+import fr.ubx.poo.view.sprite.SpritePlayer;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -23,9 +25,10 @@ public class GeneralTimer extends TimerTask {
 
     @Override
     public void run() {
-        if (linkedBomb == null) {
+        if (linkedMonster != null) {
             linkedMonster.requestMove(Direction.random());
-        } else {
+        }
+        else if(linkedBomb != null){
             if (linkedBomb.getState() < 3) {
                 System.out.println(linkedBomb.getState()+"\n");
                 linkedBomb.increaseState(1);
@@ -33,7 +36,6 @@ public class GeneralTimer extends TimerTask {
             } else {
                 linkedBomb.setExplode(true);
             }
-
         }
     }
 }
