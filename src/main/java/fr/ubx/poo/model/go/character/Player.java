@@ -30,6 +30,10 @@ public class Player extends GameObject implements Movable {
         return lives;
     }
 
+    public void getHit(){
+        lives = lives-1;
+    }
+
     public Direction getDirection() {
         return direction;
     }

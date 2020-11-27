@@ -65,6 +65,9 @@ public class Monster extends GameObject implements Movable {
                 doMove(direction);
             }
         }
+        if(game.getPlayer().getPosition().equals(this.getPosition())){
+            game.getPlayer().getHit();
+        }
         moveRequested = false;
     }
 

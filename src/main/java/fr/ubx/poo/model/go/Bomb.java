@@ -33,7 +33,6 @@ public class Bomb extends GameObject {
     public int getState() {
         return state;
     }
-
     public void increaseState(int inc) {
         this.state = this.state + inc;
     }
@@ -57,6 +56,9 @@ public class Bomb extends GameObject {
                 game.getWorld().clear(pos);
                 game.getWorld().setChanges(true);
                 return;
+            }
+            else if(game.getPlayer().getPosition().equals(pos)){
+                game.getPlayer().getHit();
             }
         }
     }
