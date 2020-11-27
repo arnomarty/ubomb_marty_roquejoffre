@@ -2,22 +2,46 @@ package fr.ubx.poo.model.go;
 
 import fr.ubx.poo.game.Game;
 import fr.ubx.poo.game.Position;
-import fr.ubx.poo.model.MonsterTimer;
+import fr.ubx.poo.model.GeneralTimer;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class Bomb extends GameObject {
 
-    int state;
-    Timer timer;
-    TimerTask countdown;
+    private int state;
+    private Timer timer;
+    private TimerTask countdown;
+    private boolean explode;
 
     public Bomb(Game game, Position position) {
         super(game, position);
+        int state = 0;
+        explode = false;
+
         timer = new Timer();
-        //*moveHandler = new MonsterTimer(this);
-        //timer.scheduleAtFixedRate(() -> requestMove(Direction.random()), 1000, 1000);
-        //timer.scheduleAtFixedRate(moveHandler, 1000, 400 );
+        countdown= new GeneralTimer(this);
+        timer.scheduleAtFixedRate(countdown, 1000, 1000 );
     }
+
+    public int getState() {
+        return state;
+    }
+
+    public void increaseState(int inc) {
+        this.state = this.state + inc;
+    }
+
+    public boolean explosionStatus(){
+        return explode;
+    }
+    public void setExplode(boolean b){
+        explode = b;
+    }
+
+    public void stop(){
+        timer.cancel();
+        timer.purge();
+    }
+
 }

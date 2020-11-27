@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import fr.ubx.poo.model.go.Bomb;
 import fr.ubx.poo.model.go.character.Monster;
 import fr.ubx.poo.model.go.character.Player;
 
@@ -22,6 +23,7 @@ public class Game {
     private final Player player;
 //MONSTERSREQ
     private List<Monster> monsters= new ArrayList<>();
+    private List<Bomb> bombs = new ArrayList<>();
 
     private final String worldPath;
     public int initPlayerLives;

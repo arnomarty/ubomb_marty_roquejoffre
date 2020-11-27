@@ -21,6 +21,10 @@ public final class ImageFactory {
             MONSTER_UP, MONSTER_RIGHT, MONSTER_DOWN, MONSTER_LEFT,
     };
 
+    private final ImageResource[] bombStates = new ImageResource[]{
+            BOMB4, BOMB3, BOMB2, BOMB1,
+    };
+
     private final ImageResource[] digits = new ImageResource[]{
             DIGIT_0, DIGIT_1, DIGIT_2, DIGIT_3, DIGIT_4,
             DIGIT_5, DIGIT_6, DIGIT_7, DIGIT_8, DIGIT_9,
@@ -62,6 +66,8 @@ public final class ImageFactory {
     }
 //MONSTERSREQ
     public Image getMonster(Direction direction){ return get(directionsMonster[direction.ordinal()]); }
+
+    public Image getBombs(int state){ return get(bombStates[state]); }
     /**
      * Holder
      */

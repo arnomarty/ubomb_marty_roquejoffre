@@ -5,6 +5,7 @@
 package fr.ubx.poo.engine;
 
 import fr.ubx.poo.game.Direction;
+import fr.ubx.poo.model.go.Bomb;
 import fr.ubx.poo.model.go.character.Monster;
 import fr.ubx.poo.view.sprite.Sprite;
 import fr.ubx.poo.view.sprite.SpriteFactory;
@@ -45,6 +46,9 @@ public final class GameEngine {
     private List<Monster> monsters;
     private List<Sprite> spriteMonsters = new ArrayList<>();
 //END
+    private List<Bomb> bombs = new ArrayList<>();
+    private List<Sprite> spriteBombs = new ArrayList<>();
+
     public GameEngine(final String windowTitle, Game game, final Stage stage) {
         this.windowTitle = windowTitle;
         this.game = game;
@@ -117,6 +121,12 @@ public final class GameEngine {
         if (input.isMoveUp()) {
             player.requestMove(Direction.N);
         }
+        if(input.isBomb()){
+            bombs.add(new Bomb(game, player.getPosition()));
+            bombs.forEach( b -> spriteBombs.add(SpriteFactory.createBomb(layer, b)) );
+
+
+        }
         input.clear();
     }
 
@@ -143,6 +153,7 @@ public final class GameEngine {
     private void update(long now) {
         player.update(now);
         monsters.forEach( m -> m.update(now));
+        bombs = checkBombs();
 
         if (player.isAlive() == false) {
             gameLoop.stop();
@@ -154,10 +165,14 @@ public final class GameEngine {
         }
         if(game.getWorld().getChanges()){
             sprites.forEach(Sprite::remove);
+            spriteBombs.forEach(Sprite::remove);
             sprites.clear();
-            game.getWorld().forEach( (pos,d) -> sprites.add(SpriteFactory.createDecor(this.layer, pos, d)));
+            spriteBombs.clear();
 
+            game.getWorld().forEach( (pos,d) -> sprites.add(SpriteFactory.createDecor(this.layer, pos, d)));
             monsters.forEach( m -> spriteMonsters.add(SpriteFactory.createMonster(layer, m)) );
+            bombs.forEach(b -> spriteBombs.add(SpriteFactory.createBomb(layer, b)));
+
             render();
             game.getWorld().setChanges(false);
         }
@@ -166,6 +181,7 @@ public final class GameEngine {
     private void render() {
         sprites.forEach(Sprite::render);
         spriteMonsters.forEach( sm -> sm.render() );
+        spriteBombs.forEach( sb -> sb.render());
         // last rendering to have player in the foreground
         spritePlayer.render();
 
@@ -173,5 +189,18 @@ public final class GameEngine {
 
     public void start() {
         gameLoop.start();
+    }
+
+    public List<Bomb> checkBombs(){
+        List<Bomb> tmp = new ArrayList<>();
+        for( Bomb b: this.bombs){
+            if(!b.explosionStatus()){
+                tmp.add(b);
+            }else{
+                b.stop();
+                this.game.getWorld().setChanges(true);
+            }
+        }
+        return tmp;
     }
 }
