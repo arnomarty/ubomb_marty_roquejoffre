@@ -14,7 +14,7 @@ import fr.ubx.poo.view.sprite.SpriteFactory;
 
 public class Player extends GameObject implements Movable {
 
-    private final boolean alive = true;
+    private boolean alive = true;
     Direction direction;
     private boolean moveRequested = false;
     private int lives = 1;
@@ -32,6 +32,7 @@ public class Player extends GameObject implements Movable {
 
     public void getHit(){
         lives = lives-1;
+        this.alive = lives > 0;
     }
 
     public Direction getDirection() {
