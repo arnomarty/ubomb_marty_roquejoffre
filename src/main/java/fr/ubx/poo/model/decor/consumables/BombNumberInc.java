@@ -3,10 +3,13 @@ package fr.ubx.poo.model.decor.consumables;
 import fr.ubx.poo.model.decor.Decor;
 
 public class BombNumberInc extends Decor {
+
     @Override
     public int getID(){
         return 4;
     }
+
+    // Cannot be moved
 
     @Override
     public boolean consumable(){
@@ -14,9 +17,7 @@ public class BombNumberInc extends Decor {
     }
 
     @Override
-    public boolean destroyable(){
-        return true;
-    }
+    public boolean destroyable(){ return true; }
 
     @Override
     public String toString() {

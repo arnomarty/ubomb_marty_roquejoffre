@@ -8,6 +8,8 @@ public class BombRangeInc extends Decor {
         return 2;
     }
 
+    // Cannot be moved
+
     @Override
     public boolean consumable(){
         return true;

@@ -38,16 +38,16 @@ public class Game {
         currentFloor = 0;
         switchedFloor = 0;
 
-        loadConfig(worldPath);
-        loadWorld(worldPath);
+        loadConfig(worldPath);       // Grabs properties from config.properties
+        loadWorld(worldPath);       // Loads the given worlds
         Position positionPlayer = null;
         List<Position> positionMonsters = new ArrayList<>();
 
         try {
-            positionPlayer = worlds.get(currentFloor).findPlayer();
+            positionPlayer = worlds.get(currentFloor).findPlayer();     // Tries to get Player's position
             player = new Player(this, positionPlayer);
 
-            for(int i=0; i<numberOfLevels; i++) {
+            for(int i=0; i<numberOfLevels; i++) {                   // Creates the monsters of each level
                 positionMonsters = worlds.get(i).findMonsters();
                 for( Position pm : positionMonsters){
                     worlds.get(i).monsters.add(new Monster(this, pm));
@@ -67,9 +67,9 @@ public class Game {
     // ------------------ ACCESSEURS ------------------ //
 
     public int getInitPlayerLives() { return initPlayerLives; }
-    public World getWorld() { return worlds.get(currentFloor); }
+    public World getWorld() { return worlds.get(currentFloor); }    // Only returns the current world
     public Player getPlayer() { return this.player; }
-    public List<Monster> getMonsters(){ return this.getWorld().monsters; };
+    public List<Monster> getMonsters(){ return this.getWorld().monsters; }; // Returns monsters from the current level
     public int getFloor(){ return this.currentFloor+1; }
     public List<Explosion> getExplosions(){return this.getWorld().explosions; }
 
@@ -79,12 +79,15 @@ public class Game {
 
     // ------------------ METHODES PUBLIQUES ------------------ //
 
+
+     // Three possible values: -1 if player is going down, 1 if player is going up, 0 if he's not switching floor.
     public void changeFloor(int n){
         currentFloor= currentFloor+n;
-        System.out.println("Direction: " + n);
         switchedFloor = n;
     }
 
+
+     // Says if there is a monster at a given position *in the current floor*
     public boolean monsterThere(Position position){
         for( Monster m : getWorld().monsters){
             if(m.getPosition().equals(position)){
@@ -93,7 +96,7 @@ public class Game {
         }
         return false;
     }
-
+    // Says if there is a bomb at a given position *in the current floor*
     public boolean bombThere(Position position){
         for(Bomb b : getWorld().bombs){
             if(b.getPosition().equals(position)){
@@ -109,6 +112,7 @@ public class Game {
 
     // ------------------ METHODES INTERNES ------------------ //
 
+     // Loads the different game properties from the config.properties file. Default values are 3 lives and 1 level
     private void loadConfig(String path) {
         try (InputStream input = new FileInputStream(new File(path, "config.properties"))) {
             // Load the configuration file
@@ -126,9 +130,10 @@ public class Game {
     }
 
 
+     // If the given world files exist, loads them into the game. Otherwise, loads the WorldStatic class.
     private World loadWorld(String path){
         try{
-            for(int k=0; k<numberOfLevels; k++) {
+            for(int k=0; k<numberOfLevels; k++) {   // For each floor...
                 List<String> raw = Files.readAllLines(Paths.get(path + "/" + prefix + (k+1) + ".txt"));
                 WorldEntity[][] grid = new WorldEntity[raw.size()][raw.get(0).length()];
                 for (int j = 0; j < raw.size(); j++) {
@@ -143,6 +148,7 @@ public class Game {
         }catch(IOException ex){
             System.out.println("oupsi");
         }
+
         return new WorldStatic();
     }
 }

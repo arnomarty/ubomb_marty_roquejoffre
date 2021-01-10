@@ -8,6 +8,8 @@ public class Heart extends Decor {
         return 1;
     }
 
+    // Cannot be moved
+
     @Override
     public boolean consumable(){
         return true;

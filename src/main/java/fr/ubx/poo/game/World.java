@@ -36,7 +36,7 @@ public class World {
         this.raw = raw;
         dimension = new Dimension(raw.length, raw[0].length);
         grid = WorldBuilder.build(raw, dimension);
-        smthHasChanged = true;
+        smthHasChanged = true;      // Something changed, please refresh
     }
 
 
@@ -54,8 +54,8 @@ public class World {
     public void clear(Position position) {
         grid.remove(position);
     }
-    public boolean getChanges(){ return smthHasChanged; }
-    public void setChanges(boolean b){ this.smthHasChanged = b; };
+    public boolean getChanges(){ return smthHasChanged; }                // Did something change?
+    public void setChanges(boolean b){ this.smthHasChanged = b; };      // Something changed, please refresh
     public boolean isEmpty(Position position) {
         return grid.get(position) == null;
     }
@@ -74,6 +74,8 @@ public class World {
         grid.forEach(fn);
     }
 
+
+     // Returns the position of the Player, if it exists. Else, error is thrown.
     public Position findPlayer() throws PositionNotFoundException {
         for (int x = 0; x < dimension.width; x++) {
             for (int y = 0; y < dimension.height; y++) {
@@ -85,6 +87,8 @@ public class World {
         throw new PositionNotFoundException("Player");
     }
 
+
+     // Same idea, but for the list of monsters.
     public List<Position> findMonsters() throws PositionNotFoundException {
         List<Position> monstersList = new ArrayList<>();
         for(int x=0; x < dimension.width; x++){
@@ -97,6 +101,8 @@ public class World {
         return monstersList;
     }
 
+
+     // Find where the Player gets out from and return the position. Default position is (0,0)
     public Position findEntry(int direction){
         for (Map.Entry<Position, Decor> entry : grid.entrySet()) {
             if(direction == 1 && entry.getValue() instanceof DoorPrevOpened){

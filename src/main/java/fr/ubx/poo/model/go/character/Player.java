@@ -24,14 +24,14 @@ public class Player extends GameObject implements Movable {
     private boolean alive = true;
     Direction direction;
     private boolean moveRequested = false;
-    private int lives = 1;
-    private int inventory = 3;
-    private int range = 1;
-    private int keys=0;
+    private int lives;             // Number of lives
+    private int inventory;        // Number of bombs
+    private int range;           // Range of bombs
+    private int keys;           // Number of keys
     private boolean winner;
-    private boolean isInvulnerable;
-    private Timer invulnerabilityCountdown;
-    private InvulnerabilityTimer invulnerabilityTask;
+    private boolean isInvulnerable;                       //
+    private Timer invulnerabilityCountdown;              // Needed for the 1sec invulnerability and sprite blinking
+    private InvulnerabilityTimer invulnerabilityTask;   //
 
 
 
@@ -42,6 +42,10 @@ public class Player extends GameObject implements Movable {
         super(game, position);
         this.direction = Direction.S;
         this.lives = game.getInitPlayerLives();
+        inventory = 3;
+        range = 1;
+        keys = 0;
+        this.winner = false;
         this.isInvulnerable = false;
     }
 
@@ -54,16 +58,16 @@ public class Player extends GameObject implements Movable {
     public int getLives() {
         return lives;
     }
-    public void setLives(int n){ this.lives = this.lives+n; }
+    public void setLives(int n){ this.lives = this.lives+n; }       // Adds or removes n lives
     public Direction getDirection() {
         return direction;
     }
     public int getInventory(){ return inventory; }
-    public void setInventory(int n){ this.inventory = this.inventory + n; }
+    public void setInventory(int n){ this.inventory = this.inventory + n; }     // Adds or removes n bombs
     public int getRange(){ return range; }
-    public void setRange(int n){ this.range = this.range + n; }
+    public void setRange(int n){ this.range = this.range + n; }     // Adds or removes n range
     public int getKeys(){ return keys; }
-    public void setKeys(int n){ this.keys = this.keys+n; }
+    public void setKeys(int n){ this.keys = this.keys+n; }          // Adds or removes n keys
     public boolean getVulnerabilityStatus(){
         return this.isInvulnerable;
     }
@@ -91,19 +95,20 @@ public class Player extends GameObject implements Movable {
         Position nextPos = direction.nextPosition(getPosition());
         Decor nextDecor = game.getWorld().get(nextPos);
 
-        if(game.getWorld().isEmpty(nextPos) || nextDecor.consumable())
-            return game.getWorld().isInside(nextPos);
-        else if(nextDecor.movable()) {
-            Position nextNextPos = direction.nextPosition(nextPos);
+        if(game.getWorld().isEmpty(nextPos) || nextDecor.consumable())     // -> If next cell empty or a bonus...
+            return game.getWorld().isInside(nextPos);                     //    All good, as long as it's inside the frame
+
+        else if(nextDecor.movable()) {                                   // -> If next cell is a box...
+            Position nextNextPos = direction.nextPosition(nextPos);     //    Check what's behind
             if(game.getWorld().isEmpty(nextNextPos) && game.getWorld().isInside(nextNextPos)
-                    && !game.monsterThere(nextNextPos)){
-                game.getWorld().clear(nextPos);
+                    && !game.monsterThere(nextNextPos) && !game.bombThere(nextNextPos)){
+                game.getWorld().clear(nextPos);         // Clears next cell, creates box behind
                 game.getWorld().set(nextNextPos, nextDecor);
                 game.getWorld().setChanges(true);
                 return true;
             }
         }
-        return false;
+        return false;       // -> If it's Decor or a closed door
     }
 
     @Override
@@ -111,6 +116,7 @@ public class Player extends GameObject implements Movable {
         Position nextPos = direction.nextPosition(getPosition());
         Decor nextDecor = game.getWorld().get(nextPos);
 
+    // Analyzes on which element the player walked on:
         if( !game.getWorld().isEmpty(nextPos) && nextDecor.consumable()){
             switch(nextDecor.getID()){
                 case 0:     // Key
@@ -142,24 +148,27 @@ public class Player extends GameObject implements Movable {
                     break;
             }
 
-            this.game.getWorld().clear(nextPos);
-            game.getWorld().setChanges(true);
+            this.game.getWorld().clear(nextPos);   // Once it's collected, delete the bonus
+            game.getWorld().setChanges(true);     // Something changed, please refresh
         }
         setPosition(nextPos);
     }
 
+
+    // When the player meets a monster or gets carpet-bombed. If he's not invulnerable, he loses a life and gets shielded.
     public void getHit(){
         if(!isInvulnerable) {
             lives = lives - 1;
-            this.alive = lives > 0;
+            this.alive = (lives > 0);
             if(alive) {
                 isInvulnerable = true;
                 invulnerabilityCountdown = new Timer();
                 invulnerabilityTask = new InvulnerabilityTimer(this);
-                invulnerabilityCountdown.schedule(invulnerabilityTask, 1000);
+                invulnerabilityCountdown.schedule(invulnerabilityTask, 1000); // Invulnerability lasts 1sec
             }
         }
     }
+
 
     public void update(long now) {
         if (moveRequested) {
@@ -170,6 +179,7 @@ public class Player extends GameObject implements Movable {
         moveRequested = false;
     }
 
+     // Will kill the timer linked to the player
     public void endTimer(){
         invulnerabilityCountdown.cancel();
         invulnerabilityCountdown.purge();

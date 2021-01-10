@@ -41,15 +41,15 @@ public final class GameEngine {
     private final String windowTitle;
     private final Game game;
     private final Player player;
-    private final List<Sprite> sprites = new ArrayList<>();
     private StatusBar statusBar;
     private Pane layer;
     private Input input;
     private Stage stage;
-    private Sprite spritePlayer;
-    private List<Sprite> spriteMonsters = new ArrayList<>();
-    private List<Sprite> spriteBombs = new ArrayList<>();
-    private List<Sprite> spriteExplosion = new ArrayList<>();
+    private Sprite spritePlayer;                                  // Player Sprites
+    private final List<Sprite> sprites = new ArrayList<>();      // Decor sprites
+    private List<Sprite> spriteMonsters = new ArrayList<>();    // Monster Sprites
+    private List<Sprite> spriteBombs = new ArrayList<>();      // Bomb Sprites
+    private List<Sprite> spriteExplosion = new ArrayList<>(); // Explosion Sprites
 
 
 
@@ -73,6 +73,9 @@ public final class GameEngine {
 
     public void start() { gameLoop.start(); }
 
+
+     // Browse through the bombs list. If one needs to explode, removes it
+    // from the list and initiate the timer destruction function (see Bomb.java)
     public void checkBombs(){
         Iterator<Bomb> iter = this.game.getWorld().bombs.iterator();
         while(iter.hasNext()){
@@ -80,11 +83,14 @@ public final class GameEngine {
             if(b.explosionStatus()){
                 iter.remove();
                 b.stop();
-                this.game.getWorld().setChanges(true);
+                this.game.getWorld().setChanges(true);  // Something changed, please refresh
             }
         }
     }
 
+
+     // Works on the same principle as the previous function, except it browses
+    // through the explosion animations list. If one is over, removes and destructs.
     public void checkExplosions(){
         Iterator<Explosion> iter = this.game.getExplosions().iterator();
         while(iter.hasNext()){
@@ -92,7 +98,7 @@ public final class GameEngine {
             if(!e.getStatus()) {
                 e.stop();
                 iter.remove();
-                game.getWorld().setChanges(true);
+                game.getWorld().setChanges(true);   // Something changed, please refresh
             }
         }
     }
@@ -104,6 +110,7 @@ public final class GameEngine {
     // ------------------ METHODES INTERNES ------------------ //
 
     private void initialize(Stage stage, Game game) {
+        // Window's set-up
         this.stage = stage;
         Group root = new Group();
         layer = new Pane();
@@ -112,21 +119,22 @@ public final class GameEngine {
         int sceneWidth = width * Sprite.size;
         int sceneHeight = height * Sprite.size;
         Scene scene = new Scene(root, sceneWidth, sceneHeight + StatusBar.height);
-        scene.getStylesheets().add(getClass().getResource("/css/application.css").toExternalForm());
 
+        scene.getStylesheets().add(getClass().getResource("/css/application.css").toExternalForm());
         stage.setTitle(windowTitle);
         stage.setScene(scene);
         stage.setResizable(false);
         stage.show();
-
         input = new Input(scene);
         root.getChildren().add(layer);
         statusBar = new StatusBar(root, sceneWidth, sceneHeight, game);
-        // Create decor sprites
+
+        // Creates sprites for, in that order: decors, the main character, and the monsters
         game.getWorld().forEach( (pos,d) -> sprites.add(SpriteFactory.createDecor(layer, pos, d)));
         spritePlayer = SpriteFactory.createPlayer(layer, player);
         game.getWorld().monsters.forEach( m -> spriteMonsters.add(SpriteFactory.createMonster(layer, m)) );
     }
+
 
     protected final void buildAndSetGameLoop() {
         gameLoop = new AnimationTimer() {
@@ -134,7 +142,7 @@ public final class GameEngine {
                 // Check keyboard actions
                 processInput(now);
 
-                // Do actions
+                // Do stuff
                 update(now);
 
                 // Graphic update
@@ -144,43 +152,46 @@ public final class GameEngine {
         };
     }
 
+
+    // Handles program's behavior when a key is pressed.
     private void processInput(long now) {
-        if (input.isExit()) {
+        if (input.isExit()) {   // Escape key
             gameLoop.stop();
             Platform.exit();
             System.exit(0);
         }
-        if (input.isMoveDown()) {
+        if (input.isMoveDown()) {   // Down key
             player.requestMove(Direction.S);
         }
-        if (input.isMoveLeft()) {
+        if (input.isMoveLeft()) {   // Left key
             player.requestMove(Direction.W);
         }
-        if (input.isMoveRight()) {
+        if (input.isMoveRight()) {  // Right key
             player.requestMove(Direction.E);
         }
-        if (input.isMoveUp()) {
+        if (input.isMoveUp()) {     // Up key
             player.requestMove(Direction.N);
         }
+    // If space bar, at least one bomb in inventory, and no bomb at player's position...
         if(input.isBomb() && player.getInventory() > 0 && !game.bombThere(player.getPosition())){
-            game.getWorld().bombs.add(new Bomb(game, player.getPosition()));
-            this.player.setInventory(-1);
-            statusBar.update(game);
-            game.getWorld().bombs.forEach( b -> spriteBombs.add(SpriteFactory.createBomb(layer, b)) );
+            game.getWorld().bombs.add(new Bomb(game, player.getPosition()));          // Add a bomb to bombs list
+            this.player.setInventory(-1);                                            // Apply changes to the inventory
+            statusBar.update(game);                                                 // Update status bar accordingly
+            game.getWorld().bombs.forEach( b -> spriteBombs.add(SpriteFactory.createBomb(layer, b)) );  // Updates sprites list
         }
+    // If enter key, and at least one key in the inventory...
         if(input.isKey() && game.getPlayer().getKeys() > 0){
-            System.out.println("Trying to use key!");
-            Position facing = player.getDirection().nextPosition(player.getPosition());
+            Position facing = player.getDirection().nextPosition(player.getPosition()); // Get the position in front of player
             if(game.getWorld().get(facing) instanceof DoorNextClosed){
-                System.out.println("Opened the door!");
                 game.getWorld().clear(facing);
                 game.getWorld().set(facing, new DoorNextOpened());
-                player.setKeys(-1);
-                game.getWorld().setChanges(true);
+                player.setKeys(-1);                  // Removes one key from inventory
+                game.getWorld().setChanges(true);   // Something changed, please refresh
             }
         }
         input.clear();
     }
+
 
     private void showMessage(String msg, Color color) {
         Text waitingForKey = new Text(msg);
@@ -202,32 +213,34 @@ public final class GameEngine {
     }
 
 
+    // This function handles every changed relative to the game and the Sprites management.
     private void update(long now) {
 
-        if(game.switchedFloor != 0){
-            System.out.println("switched floor: " + game.switchedFloor);
-            player.setPosition(game.getWorld().findEntry(game.switchedFloor));
-            initialize(stage, game);
-            game.getWorld().setChanges(true);
+        if(game.switchedFloor != 0){            // --> If the player went up (=1) or down (=-1) in the dungeon...
+            player.setPosition(game.getWorld().findEntry(game.switchedFloor));  // Find which door the player comes from
+            initialize(stage, game);            // (Re)initialize the game with the new grid
+            game.getWorld().setChanges(true);   // Something changed, please refresh
             game.switchedFloor = 0;
         }
-        player.update(now);
-        game.getWorld().monsters.forEach( m -> m.update(now));
-        checkBombs();
-        checkExplosions();
+        player.update(now);                                       // Updates player's position
+        game.getWorld().monsters.forEach( m -> m.update(now));   // Updates each monster
+        checkBombs();                                           // Look at the public functions
+        checkExplosions();                                     //  ^
 
         if (player.isAlive() == false) {
             gameLoop.stop();
-            showMessage("Perdu!", Color.RED);
+            showMessage("Defeat!", Color.RED);
         }
         if (player.isWinner()) {
             gameLoop.stop();
-            showMessage("Gagné", Color.BLUE);
+            showMessage("Victory!", Color.BLUE);
         }
+    // If a monster is dead, remove it from the list
         game.getWorld().monsters.removeIf( m -> m.isAlive() == false);
 
+    // If something changed...
         if(game.getWorld().getChanges()){
-            sprites.forEach(Sprite::remove);
+            sprites.forEach(Sprite::remove);        // Clear every sprites list
             sprites.clear();
             spriteBombs.forEach(Sprite::remove);
             spriteBombs.clear();
@@ -235,24 +248,25 @@ public final class GameEngine {
             spriteMonsters.clear();
             spriteExplosion.forEach(Sprite::remove);
             spriteExplosion.clear();
-
+        // Reload the new updated sprites lists
             game.getWorld().forEach( (pos,d) -> sprites.add(SpriteFactory.createDecor(this.layer, pos, d)));
             game.getWorld().monsters.forEach( m -> spriteMonsters.add(SpriteFactory.createMonster(layer, m)) );
             game.getWorld().bombs.forEach(b -> spriteBombs.add(SpriteFactory.createBomb(layer, b)));
             game.getWorld().explosions.forEach(e -> spriteExplosion.add(SpriteFactory.createExplosion(layer, e)));
             render();
-            game.getWorld().setChanges(false);
+            game.getWorld().setChanges(false);  // Nothing changed now, no need to refresh
         }
     }
 
+
     private void render() {
         sprites.forEach(Sprite::render);
-        spriteMonsters.forEach( sm -> sm.render() );
         spriteBombs.forEach( sb -> sb.render());
-
-        // last rendering to have player in the foreground
-        spritePlayer.render();
+        spriteMonsters.forEach( sm -> sm.render() );
         spriteExplosion.forEach( se -> se.render());
+
+        // Player rendered last, his sprite above the others
+        spritePlayer.render();
     }
 
 

@@ -16,8 +16,8 @@ public class Monster extends GameObject implements Movable {
     private boolean alive = true;
     Direction direction;
     private boolean moveRequested = false;
-    Timer timer;
-    TimerTask moveHandler;
+    Timer timer;                 // Handles movement
+    TimerTask moveHandler;      //  ^
 
 
 
@@ -30,7 +30,8 @@ public class Monster extends GameObject implements Movable {
 
         timer = new Timer();
         moveHandler = new GeneralTimer(this);
-        timer.scheduleAtFixedRate(moveHandler, 1000, 1500 );
+         // Calls moveHandler every second
+        timer.scheduleAtFixedRate(moveHandler, 1000, 1000 );
     }
 
 
@@ -57,6 +58,8 @@ public class Monster extends GameObject implements Movable {
         moveRequested = true;
     }
 
+
+    // Can only move if the cell is empty, contains a bomb or a bonus, without a monster there already
     @Override
     public boolean canMove(Direction direction) {
         Position nextPos = direction.nextPosition(getPosition());
@@ -65,25 +68,27 @@ public class Monster extends GameObject implements Movable {
                 && game.getWorld().isInside(nextPos) && !game.monsterThere(nextPos);
     }
 
+
     @Override
     public void doMove(Direction direction) {
             Position nextPos = direction.nextPosition(getPosition());
             setPosition(nextPos);
     }
 
+     // Basically kills this monster
     public void kill(){
         this.alive = false;
-        this.game.getWorld().setChanges(true);
+        this.game.getWorld().setChanges(true);  // Something changed, please refresh
     }
+
 
     public void update(long now) {
         if (moveRequested) {
-//            if (canMove(direction)) {
                 doMove(direction);
- //           }
         }
+         // Damages player if the monster walks on his cell
         if(game.getPlayer().getPosition().equals(this.getPosition())){
-            game.getPlayer().getHit();
+            game.getPlayer().getHit();  // See Player.java
         }
         moveRequested = false;
     }

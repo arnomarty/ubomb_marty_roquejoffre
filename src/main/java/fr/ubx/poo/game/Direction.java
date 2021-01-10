@@ -6,6 +6,9 @@ package fr.ubx.poo.game;
 
 import java.util.Random;
 
+
+// Handles entities' cardinal direction, for sprites orientation and movement.
+
 public enum Direction {
     N {
         @Override

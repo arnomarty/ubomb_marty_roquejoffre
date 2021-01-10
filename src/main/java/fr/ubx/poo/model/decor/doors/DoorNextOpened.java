@@ -9,6 +9,8 @@ public class DoorNextOpened extends Decor {
         return 6;
     }
 
+    // Cannot get moved nor destroyed
+
     @Override
     public boolean consumable(){
         return true;

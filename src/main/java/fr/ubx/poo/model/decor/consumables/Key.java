@@ -8,6 +8,8 @@ public class Key extends Decor {
         return 0;
     }
 
+    // Cannot be moved
+
     @Override
     public boolean consumable(){
         return true;

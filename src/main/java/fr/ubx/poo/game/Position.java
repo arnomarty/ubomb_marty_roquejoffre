@@ -6,6 +6,8 @@ package fr.ubx.poo.game;
 
 import java.util.Objects;
 
+// Gives coordinates to every game entity.
+
 public class Position {
     public final int x;
     public final int y;

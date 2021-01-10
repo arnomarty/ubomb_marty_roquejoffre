@@ -8,15 +8,15 @@ public class BombRangeDec extends Decor {
         return 3;
     }
 
+    // Cannot be moved
+
     @Override
     public boolean consumable(){
         return true;
     }
 
     @Override
-    public boolean destroyable(){
-        return true;
-    }
+    public boolean destroyable(){ return true; }
 
     @Override
     public String toString() {
