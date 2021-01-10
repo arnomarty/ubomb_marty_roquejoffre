@@ -18,20 +18,37 @@ public abstract class Sprite {
     private Image image;
     public ColorAdjust effect = new ColorAdjust();
 
+
+
+
+    // ------------------ CONSTRUCTEUR ------------------ //
+
     public Sprite(Pane layer, Image image) {
         this.layer = layer;
         this.image = image;
     }
+
+
+
+
+
+    // ------------------ ACCESSEURS ------------------ //
+
+    public abstract Position getPosition();
+
+
+
+
+
+    // ------------------ METHODES PUBLIQUES ------------------ //
+
+    public abstract void updateImage();
 
     public final void setImage(Image image) {
         if (this.image == null || this.image != image) {
             this.image = image;
         }
     }
-
-    public abstract void updateImage();
-
-    public abstract Position getPosition();
 
     public final void render() {
         if (imageView != null) {

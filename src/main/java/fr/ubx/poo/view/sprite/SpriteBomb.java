@@ -11,6 +11,7 @@ public class SpriteBomb extends SpriteGameObject {
         super(layer, null, bomb);
         updateImage();
     }
+
     @Override
     public void updateImage() {
         Bomb b = (Bomb) go;

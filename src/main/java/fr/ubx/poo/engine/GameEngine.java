@@ -5,7 +5,11 @@
 package fr.ubx.poo.engine;
 
 import fr.ubx.poo.game.Direction;
+import fr.ubx.poo.game.Position;
+import fr.ubx.poo.model.decor.doors.DoorNextClosed;
+import fr.ubx.poo.model.decor.doors.DoorNextOpened;
 import fr.ubx.poo.model.go.Bomb;
+import fr.ubx.poo.model.go.Explosion;
 import fr.ubx.poo.model.go.character.Monster;
 import fr.ubx.poo.view.sprite.Sprite;
 import fr.ubx.poo.view.sprite.SpriteFactory;
@@ -25,6 +29,7 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import static fr.ubx.poo.game.Direction.random;
@@ -42,28 +47,66 @@ public final class GameEngine {
     private Input input;
     private Stage stage;
     private Sprite spritePlayer;
-//MONSTERSREQ
-    private List<Monster> monsters;
     private List<Sprite> spriteMonsters = new ArrayList<>();
-//END
-    private List<Bomb> bombs = new ArrayList<>();
     private List<Sprite> spriteBombs = new ArrayList<>();
+    private List<Sprite> spriteExplosion = new ArrayList<>();
+
+
+
+
+    // ------------------ CONSTRUCTEUR ------------------ //
 
     public GameEngine(final String windowTitle, Game game, final Stage stage) {
         this.windowTitle = windowTitle;
         this.game = game;
         this.player = game.getPlayer();
-//MONSTERSREQ
-        this.monsters = game.getMonsters();
+        game.getWorld().monsters = game.getMonsters();
         initialize(stage, game);
         buildAndSetGameLoop();
     }
+
+
+
+
+
+    // ------------------ METHODES PUBLIQUES ------------------ //
+
+    public void start() { gameLoop.start(); }
+
+    public void checkBombs(){
+        Iterator<Bomb> iter = this.game.getWorld().bombs.iterator();
+        while(iter.hasNext()){
+            Bomb b = iter.next();
+            if(b.explosionStatus()){
+                iter.remove();
+                b.stop();
+                this.game.getWorld().setChanges(true);
+            }
+        }
+    }
+
+    public void checkExplosions(){
+        Iterator<Explosion> iter = this.game.getExplosions().iterator();
+        while(iter.hasNext()){
+            Explosion e = iter.next();
+            if(!e.getStatus()) {
+                e.stop();
+                iter.remove();
+                game.getWorld().setChanges(true);
+            }
+        }
+    }
+
+
+
+
+
+    // ------------------ METHODES INTERNES ------------------ //
 
     private void initialize(Stage stage, Game game) {
         this.stage = stage;
         Group root = new Group();
         layer = new Pane();
-
         int height = game.getWorld().dimension.height;
         int width = game.getWorld().dimension.width;
         int sceneWidth = width * Sprite.size;
@@ -82,9 +125,7 @@ public final class GameEngine {
         // Create decor sprites
         game.getWorld().forEach( (pos,d) -> sprites.add(SpriteFactory.createDecor(layer, pos, d)));
         spritePlayer = SpriteFactory.createPlayer(layer, player);
-//MONSTERSREQ
-        monsters.forEach( m -> spriteMonsters.add(SpriteFactory.createMonster(layer, m)) );
-
+        game.getWorld().monsters.forEach( m -> spriteMonsters.add(SpriteFactory.createMonster(layer, m)) );
     }
 
     protected final void buildAndSetGameLoop() {
@@ -121,11 +162,22 @@ public final class GameEngine {
         if (input.isMoveUp()) {
             player.requestMove(Direction.N);
         }
-        if(input.isBomb()){
-            bombs.add(new Bomb(game, player.getPosition()));
-            bombs.forEach( b -> spriteBombs.add(SpriteFactory.createBomb(layer, b)) );
-
-
+        if(input.isBomb() && player.getInventory() > 0 && !game.bombThere(player.getPosition())){
+            game.getWorld().bombs.add(new Bomb(game, player.getPosition()));
+            this.player.setInventory(-1);
+            statusBar.update(game);
+            game.getWorld().bombs.forEach( b -> spriteBombs.add(SpriteFactory.createBomb(layer, b)) );
+        }
+        if(input.isKey() && game.getPlayer().getKeys() > 0){
+            System.out.println("Trying to use key!");
+            Position facing = player.getDirection().nextPosition(player.getPosition());
+            if(game.getWorld().get(facing) instanceof DoorNextClosed){
+                System.out.println("Opened the door!");
+                game.getWorld().clear(facing);
+                game.getWorld().set(facing, new DoorNextOpened());
+                player.setKeys(-1);
+                game.getWorld().setChanges(true);
+            }
         }
         input.clear();
     }
@@ -151,9 +203,18 @@ public final class GameEngine {
 
 
     private void update(long now) {
+
+        if(game.switchedFloor != 0){
+            System.out.println("switched floor: " + game.switchedFloor);
+            player.setPosition(game.getWorld().findEntry(game.switchedFloor));
+            initialize(stage, game);
+            game.getWorld().setChanges(true);
+            game.switchedFloor = 0;
+        }
         player.update(now);
-        monsters.forEach( m -> m.update(now));
-        bombs = checkBombs();
+        game.getWorld().monsters.forEach( m -> m.update(now));
+        checkBombs();
+        checkExplosions();
 
         if (player.isAlive() == false) {
             gameLoop.stop();
@@ -163,16 +224,22 @@ public final class GameEngine {
             gameLoop.stop();
             showMessage("Gagné", Color.BLUE);
         }
+        game.getWorld().monsters.removeIf( m -> m.isAlive() == false);
+
         if(game.getWorld().getChanges()){
             sprites.forEach(Sprite::remove);
-            spriteBombs.forEach(Sprite::remove);
             sprites.clear();
+            spriteBombs.forEach(Sprite::remove);
             spriteBombs.clear();
+            spriteMonsters.forEach(Sprite::remove);
+            spriteMonsters.clear();
+            spriteExplosion.forEach(Sprite::remove);
+            spriteExplosion.clear();
 
             game.getWorld().forEach( (pos,d) -> sprites.add(SpriteFactory.createDecor(this.layer, pos, d)));
-            monsters.forEach( m -> spriteMonsters.add(SpriteFactory.createMonster(layer, m)) );
-            bombs.forEach(b -> spriteBombs.add(SpriteFactory.createBomb(layer, b)));
-
+            game.getWorld().monsters.forEach( m -> spriteMonsters.add(SpriteFactory.createMonster(layer, m)) );
+            game.getWorld().bombs.forEach(b -> spriteBombs.add(SpriteFactory.createBomb(layer, b)));
+            game.getWorld().explosions.forEach(e -> spriteExplosion.add(SpriteFactory.createExplosion(layer, e)));
             render();
             game.getWorld().setChanges(false);
         }
@@ -182,26 +249,11 @@ public final class GameEngine {
         sprites.forEach(Sprite::render);
         spriteMonsters.forEach( sm -> sm.render() );
         spriteBombs.forEach( sb -> sb.render());
+
         // last rendering to have player in the foreground
         spritePlayer.render();
-
+        spriteExplosion.forEach( se -> se.render());
     }
 
-    public void start() {
-        gameLoop.start();
-    }
 
-    public List<Bomb> checkBombs(){
-        List<Bomb> tmp = new ArrayList<>();
-        for( Bomb b: this.bombs){
-            if(!b.explosionStatus()){
-                tmp.add(b);
-            }else{
-
-                b.stop();
-                this.game.getWorld().setChanges(true);
-            }
-        }
-        return tmp;
-    }
 }

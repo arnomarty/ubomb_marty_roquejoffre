@@ -11,7 +11,14 @@ import java.util.Hashtable;
 import java.util.Map;
 
 public class WorldBuilder {
+
     private final Map<Position, Decor> grid = new Hashtable<>();
+
+
+
+
+
+    // ------------------ CONSTRUCTEUR ------------------ //
 
     private WorldBuilder() {
     }
@@ -28,6 +35,12 @@ public class WorldBuilder {
         }
         return builder.grid;
     }
+
+
+
+
+
+    // ------------------ METHODES INTERNES ------------------ //
 
     private static Decor processEntity(WorldEntity entity) {
         switch (entity) {

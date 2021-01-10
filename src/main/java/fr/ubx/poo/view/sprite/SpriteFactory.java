@@ -13,6 +13,7 @@ import fr.ubx.poo.model.decor.doors.DoorNextClosed;
 import fr.ubx.poo.model.decor.doors.DoorNextOpened;
 import fr.ubx.poo.model.decor.doors.DoorPrevOpened;
 import fr.ubx.poo.model.go.Bomb;
+import fr.ubx.poo.model.go.Explosion;
 import fr.ubx.poo.model.go.character.Monster;
 import fr.ubx.poo.model.go.character.Player;
 import fr.ubx.poo.view.image.ImageFactory;
@@ -55,10 +56,12 @@ public final class SpriteFactory {
     public static Sprite createPlayer(Pane layer, Player player) {
         return new SpritePlayer(layer, player);
     }
-//MONSTERSREQ
+
     public static Sprite createMonster(Pane layer, Monster monster){
         return new SpriteMonster(layer, monster);
     }
 
     public static Sprite createBomb(Pane layer, Bomb bomb) { return new SpriteBomb(layer, bomb); }
+
+    public static Sprite createExplosion(Pane layer, Explosion explosion){ return new SpriteExplosion(layer, explosion); }
 }

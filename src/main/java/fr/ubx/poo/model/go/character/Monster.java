@@ -16,25 +16,44 @@ public class Monster extends GameObject implements Movable {
     private boolean alive = true;
     Direction direction;
     private boolean moveRequested = false;
-    private int lives = 1;
     Timer timer;
     TimerTask moveHandler;
+
+
+
+
+    // ------------------ CONSTRUCTEUR ------------------ //
 
     public Monster(Game game, Position position) {
         super(game, position);
         this.direction = Direction.S;
-        this.lives = game.getInitPlayerLives();
 
         timer = new Timer();
         moveHandler = new GeneralTimer(this);
-        //timer.scheduleAtFixedRate(() -> requestMove(Direction.random()), 1000, 1000);
         timer.scheduleAtFixedRate(moveHandler, 1000, 1500 );
     }
 
-    public void requestMove(Direction direction) {
-        if (direction != this.direction) {
-            this.direction = direction;
-        }
+
+
+
+
+    // ------------------ ACCESSEURS ------------------ //
+
+    public boolean isAlive() { return alive; }
+    public Direction getDirection() {
+        return direction;
+    }
+
+
+
+
+
+    // ------------------ METHODES PUBLIQUES ------------------ //
+
+    public void requestMove() {
+        do{
+            this.direction = Direction.random();
+        }while( !canMove(direction)  );
         moveRequested = true;
     }
 
@@ -42,11 +61,8 @@ public class Monster extends GameObject implements Movable {
     public boolean canMove(Direction direction) {
         Position nextPos = direction.nextPosition(getPosition());
         Decor nextDecor = game.getWorld().get(nextPos);
-
-        return (game.getWorld()).isInside(nextPos)
-                && !(nextDecor instanceof Decor)
-                && !(game.monsterThere(nextPos));
-
+        return (game.getWorld().isEmpty(nextPos) || nextDecor.consumable())
+                && game.getWorld().isInside(nextPos) && !game.monsterThere(nextPos);
     }
 
     @Override
@@ -55,25 +71,21 @@ public class Monster extends GameObject implements Movable {
             setPosition(nextPos);
     }
 
-    public int getLives() {
-        return lives;
+    public void kill(){
+        this.alive = false;
+        this.game.getWorld().setChanges(true);
     }
 
     public void update(long now) {
         if (moveRequested) {
-            if (canMove(direction)) {
+//            if (canMove(direction)) {
                 doMove(direction);
-            }
+ //           }
         }
         if(game.getPlayer().getPosition().equals(this.getPosition())){
             game.getPlayer().getHit();
         }
         moveRequested = false;
-    }
-
-    public boolean isAlive() { return alive; }
-    public Direction getDirection() {
-        return direction;
     }
 
 }

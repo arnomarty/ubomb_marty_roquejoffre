@@ -7,6 +7,8 @@ import fr.ubx.poo.model.GeneralTimer;
 import fr.ubx.poo.model.decor.Box;
 import fr.ubx.poo.model.decor.Decor;
 import fr.ubx.poo.model.decor.consumables.*;
+import fr.ubx.poo.model.go.character.Monster;
+import fr.ubx.poo.view.sprite.SpriteFactory;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -19,16 +21,26 @@ public class Bomb extends GameObject {
     private TimerTask countdown;
     private boolean explode;
 
+
+
+
+    // ------------------ CONSTRUCTEUR ------------------ //
+
     public Bomb(Game game, Position position) {
         super(game, position);
-        System.out.println(position);
         state = 0;
-        range = 1;
+        range = game.getPlayer().getRange();
         explode = false;
         timer = new Timer();
         countdown= new GeneralTimer(this);
-        timer.scheduleAtFixedRate(countdown, 1000, 1000 );
+        timer.scheduleAtFixedRate(countdown, 500, 500 );
     }
+
+
+
+
+
+    // ------------------ ACCESSEURS ------------------ //
 
     public int getState() {
         return state;
@@ -36,7 +48,6 @@ public class Bomb extends GameObject {
     public void increaseState(int inc) {
         this.state = this.state + inc;
     }
-
     public boolean explosionStatus(){
         return explode;
     }
@@ -44,23 +55,38 @@ public class Bomb extends GameObject {
         explode = b;
     }
 
+
+
+
+
+    // ------------------ METHODES PUBLIQUES ------------------ //
+
     public void explode(Direction direction){
-        Position pos = getPosition();
-        for(int i=0; i<range; i++){
-            pos = direction.nextPosition(pos);
-            System.out.println(pos + "\n");
-//A OPTIMISER!
-            if(game.getWorld().get(pos) instanceof Box || game.getWorld().get(pos) instanceof Heart
-             || game.getWorld().get(pos) instanceof BombNumberDec || game.getWorld().get(pos) instanceof BombNumberInc
-             || game.getWorld().get(pos) instanceof BombRangeDec || game.getWorld().get(pos) instanceof BombRangeInc){
+        int i=0;
+        Position pos= getPosition();
+
+        Decor decor;
+        do{
+            decor = game.getWorld().get(pos);
+            if(!game.getWorld().isEmpty(pos) && !decor.destroyable()){
+                return;
+            }
+            game.getWorld().explosions.add(new Explosion(game,pos));
+
+            if(game.getPlayer().getPosition().equals(pos))
+                game.getPlayer().getHit();
+            if( !game.getWorld().isEmpty(pos) && decor.destroyable() ){
                 game.getWorld().clear(pos);
                 game.getWorld().setChanges(true);
                 return;
             }
-            else if(game.getPlayer().getPosition().equals(pos)){
-                game.getPlayer().getHit();
+            for (Monster m : game.getMonsters()) {
+                if (m.getPosition().equals(pos))
+                    m.kill();
             }
-        }
+            i++;
+            pos = direction.nextPosition(pos);
+        }while(i <= range);
     }
 
     public void stop(){
@@ -68,9 +94,9 @@ public class Bomb extends GameObject {
         explode(Direction.S);
         explode(Direction.E);
         explode(Direction.W);
+        game.getPlayer().setInventory(1);
         timer.cancel();
         timer.purge();
-
     }
 
 }

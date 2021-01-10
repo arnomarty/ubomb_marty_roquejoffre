@@ -36,6 +36,7 @@ public enum ImageResource {
     MONSTER_DOWN("monster_down.png"),
     MONSTER_LEFT("monster_left.png"),
     MONSTER_RIGHT("monster_right.png"),
+    EXPLOSION("explosion.png"),
     BOMB4("bomb4.png"),
     BOMB3("bomb3.png"),
     BOMB2("bomb2.png"),
